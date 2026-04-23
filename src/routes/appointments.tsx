@@ -9,6 +9,7 @@ import {
   isSlotTaken,
   TIME_SLOTS,
   updateAppointmentStatus,
+  updateAppointment,
   useAppointments,
   useAuth,
   useDoctors,
@@ -473,10 +474,10 @@ function EditDialog({
     if (slotChanged && isSlotTaken(doctorId, date, time, appt.id)) return setError("This time slot is already booked.");
     setSaving(true);
     try {
-      await updateAppointmentStatus(appt.id, status);
+      await updateAppointment(appt.id, { patientId, doctorId, date, time, purpose: purpose.trim(), status });
       onSaved();
-    } catch {
-      setError("Unable to update appointment.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to update appointment.");
     } finally {
       setSaving(false);
     }

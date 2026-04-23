@@ -688,6 +688,78 @@ async function handleApi(req, res, pathname) {
       return;
     }
 
+    // PUT /api/appointments/:id — full edit
+    if (
+      pathname.startsWith("/api/appointments/") &&
+      !pathname.endsWith("/status") &&
+      req.method === "PUT"
+    ) {
+      if (!requireRole(user, ["admin", "receptionist"], res)) return;
+      const id = decodeURIComponent(pathname.split("/")[3]);
+      const payload = await readBody(req);
+      const db = readDb();
+      const appointment = db.appointments.find((item) => item.id === id);
+      if (!appointment) {
+        sendError(res, 404, "Appointment not found");
+        return;
+      }
+      const patient = db.patients.find((item) => item.id === (payload.patientId || appointment.patientId));
+      const doctor = db.doctors.find((item) => item.id === (payload.doctorId || appointment.doctorId));
+      if (!patient || !doctor) {
+        sendError(res, 400, "Invalid patient or doctor.");
+        return;
+      }
+      const purpose = String(payload.purpose || "").trim();
+      if (!purpose) {
+        sendError(res, 400, "Purpose is required.");
+        return;
+      }
+      const allowed = ["Confirmed", "Waiting", "In Session", "Completed", "Cancelled"];
+      const newStatus = payload.status || appointment.status;
+      if (!allowed.includes(newStatus)) {
+        sendError(res, 400, "Invalid appointment status.");
+        return;
+      }
+      appointment.patientId = patient.id;
+      appointment.patientName = patient.name;
+      appointment.doctorId = doctor.id;
+      appointment.doctorName = doctor.name;
+      appointment.date = String(payload.date || appointment.date);
+      appointment.time = String(payload.time || appointment.time || "");
+      appointment.purpose = purpose;
+      appointment.status = newStatus;
+      addAudit(db, user.id, `Appointment updated: ${appointment.id}`);
+      writeDb(db);
+      sendDb(res, 200, db, { appointment });
+      return;
+    }
+
+    // PATCH /api/bills/:id/status — mark paid/pending
+    if (
+      pathname.startsWith("/api/bills/") &&
+      pathname.endsWith("/status") &&
+      req.method === "PATCH"
+    ) {
+      if (!requireRole(user, ["admin", "receptionist", "doctor"], res)) return;
+      const id = decodeURIComponent(pathname.split("/")[3]);
+      const payload = await readBody(req);
+      const db = readDb();
+      const bill = db.bills.find((item) => item.id === id);
+      if (!bill) {
+        sendError(res, 404, "Bill not found");
+        return;
+      }
+      if (payload.status !== "Paid" && payload.status !== "Pending") {
+        sendError(res, 400, "Invalid bill status.");
+        return;
+      }
+      bill.status = payload.status;
+      addAudit(db, user.id, `Bill status updated: ${bill.id} -> ${bill.status}`);
+      writeDb(db);
+      sendDb(res, 200, db, { bill });
+      return;
+    }
+
     if (pathname === "/api/bills" && req.method === "POST") {
       if (!requireRole(user, ["admin", "receptionist", "doctor"], res)) return;
       const payload = await readBody(req);

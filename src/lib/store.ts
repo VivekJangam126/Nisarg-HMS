@@ -484,6 +484,18 @@ export async function updateAppointmentStatus(id: string, status: Appointment["s
   applyServerPayload(payload);
 }
 
+export async function updateAppointment(
+  id: string,
+  input: Partial<Pick<Appointment, "patientId" | "doctorId" | "date" | "time" | "purpose" | "status">>
+): Promise<Appointment> {
+  const payload = await api<ServerPayload & { appointment: Appointment }>(
+    `/api/appointments/${encodeURIComponent(id)}`,
+    { method: "PUT", body: JSON.stringify(input) },
+  );
+  applyServerPayload(payload);
+  return payload.appointment;
+}
+
 // ---------- Bills ----------
 export function useBills(): Bill[] {
   return useSnapshot((snapshot) => snapshot.bills);
