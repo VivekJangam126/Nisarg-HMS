@@ -1,0 +1,58 @@
+/**
+ * Nisarg Women Healthcare - CSS Color Variables
+ * Import this in your main CSS file or index.html
+ */
+
+:root {
+  /* Blue Family - Structural backbone */
+  --blue-deep: #185FA5;
+  --blue-mid: #378ADD;
+  --blue-light: #5BA3E8;
+  --blue-lighter: #E3EEF8;
+
+  /* Teal - Positive/Stable outcomes */
+  --teal-full: #1D9E75;
+  --teal-pale: #D8F3E8;
+  --teal-dark: #0F6D54;
+
+  /* Red - Critical/Urgent signals */
+  --red-full: #DC2626;
+  --red-light: #FEE2E2;
+  --red-text: #991B1B;
+
+  /* Amber - Caution/Warning zone */
+  --amber-full: #D97706;
+  --amber-light: #FEF3C7;
+  --amber-text: #92400E;
+
+  /* Neutrals - Core UI */
+  --neutral-background: #F1EFE8;
+  --neutral-border: #D3D1C7;
+  --neutral-surface: #FFFFFF;
+  --neutral-canvas: #F9F7F4;
+
+  /* Text hierarchy */
+  --text-primary: #1F2937;
+  --text-secondary: #6B7280;
+  --text-tertiary: #A3A29F;
+
+  /* Semantic colors */
+  --success: #10B981;
+  --warning: #F59E0B;
+  --error: #EF4444;
+  --info: #3B82F6;
+}
+
+/* Light mode (default) */
+@media (prefers-color-scheme: light) {
+  :root {
+    color-scheme: light;
+  }
+}
+
+/* Dark mode (if needed in future) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Can add dark mode color overrides here */
+  }
+}
