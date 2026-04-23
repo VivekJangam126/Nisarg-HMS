@@ -4,7 +4,7 @@
   "sideEffects": false,
   "type": "module",
   "scripts": {
-    "api": "node server.cjs",
+    "api": "node server/server.cjs",
     "dev": "vite dev",
     "build": "vite build",
     "build:dev": "vite build --mode development",
